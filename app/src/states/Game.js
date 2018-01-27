@@ -16,7 +16,7 @@ export default class extends Phaser.State {
 
     let that = this;
 
-    this.colors=[0xcc3333, 0x999933, 0x3333cc, 0x33cc33]
+    this.colors=[0xff0000, 0x00ff00, 0x0000ff, 0xff00ff, 0xffff00, 0x00ffff]
 
     this.hudView = new HudView({
         "model": null,
@@ -26,6 +26,8 @@ export default class extends Phaser.State {
     this.$htmlWrapper.append(this.hudView.$el);
 
     this.myId = null;
+    
+//    localStorage.clear();
 
     let myIdString = localStorage.getItem("my_id");
     if(myIdString){
