@@ -24,7 +24,6 @@ export default class extends Phaser.State {
     });
     this.$htmlWrapper = $("#html-wrapper");
     this.$htmlWrapper.append(this.hudView.$el);
-    // localStorage.clear();
 
     this.myId = null;
 
@@ -32,21 +31,21 @@ export default class extends Phaser.State {
     if(myIdString){
       this.myId = parseInt(myIdString);
     }
-
     
     this.myTreeGroup = game.add.group();
     this.myGenome = null;
 
-
     if(this.myId){
-      // TODO: Get Data from Jasper
-
+      console.log("MY ID FOUND");
+      console.log(this.myId);
       $.ajax({
         "url": "http://35.227.37.79/dna.php?getuser&id="+this.myId,
         "method": "GET",
         "success": function( response ) {
+            let parsed = JSON.parse(response);
+            console.log(parsed);
             that.myTreeGroup = game.add.group();
-            that.myGenome = JSON.parse(response.genome);
+            that.myGenome = (parsed.genome);
 
             that.drawTree(that.myGenome, game.width, game.height, 0, 0, 0, that.myTreeGroup);
         }
@@ -67,7 +66,7 @@ export default class extends Phaser.State {
             let parsed = JSON.parse(response);
             that.myId = parsed.id;
 
-            localStorage.setItem("my_id", this.myId)
+            localStorage.setItem("my_id", that.myId)
             that.myTreeGroup = game.add.group();
 
             that.myGenome = JSON.parse(myInititalGenomeString);
