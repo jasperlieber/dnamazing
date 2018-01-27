@@ -26,6 +26,7 @@ export default class extends Phaser.State {
     this.$htmlWrapper.append(this.hudView.$el);
 
     this.myId = null;
+    // localStorage.clear();
 
     let myIdString = localStorage.getItem("my_id");
     if(myIdString){
@@ -34,6 +35,7 @@ export default class extends Phaser.State {
     
     this.myTreeGroup = game.add.group();
     this.myGenome = null;
+
 
     if(this.myId){
       console.log("MY ID FOUND");
@@ -147,19 +149,9 @@ export default class extends Phaser.State {
 
 
 
-    for(let i = 0;i<length;i++){
-      $.ajax({
-        "onComplete": function(){
-          console.log(i)
-        }
-      })
-    }
 
 
-    console.log(otherUserId);
     let otherUserData =  _.findWhere(this.allUsers, {id: "" + otherUserId + ""});
-    console.log("OTHER USER DATA", otherUserData);
-
 
     if(otherUserData){
 
@@ -167,12 +159,29 @@ export default class extends Phaser.State {
         "0": this.myGenome,
         "1": otherUserData.genome
       };
-      console.log("Other User To Mate With: ", otherUserData);
 
       this.myGenome = newTree;
       this.myTreeGroup.removeAll();
 
       this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.myTreeGroup);
+
+      let myGenomeString = JSON.stringify(this.myGenome);
+
+      let url = "http://35.227.37.79/dna.php"
+
+      $.ajax({
+        "url": url,
+        "method": "POST",
+        "data": {
+          "setuser": true,
+          "id": this.myId,
+          "genome": myGenomeString
+        },
+        "success": function( response ) {
+          console.log("FINISHED")
+        }
+      })
+
 
 
     }
