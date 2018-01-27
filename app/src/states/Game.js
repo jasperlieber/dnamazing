@@ -1,35 +1,33 @@
 /* globals __DEV__ */
 import Phaser from 'phaser'
-import Mushroom from '../sprites/Mushroom'
+
+
+
+import GenomeData from "../../assets/data/genome"
+
 
 export default class extends Phaser.State {
   init () {}
   preload () {}
-
   create () {
-    const bannerText = 'Phaser + ES6 + Webpack'
-    let banner = this.add.text(this.world.centerX, this.game.height - 80, bannerText, {
-      font: '40px Bangers',
-      fill: '#77BFA3',
-      smoothed: false
-    })
 
-    banner.padding.set(10, 16)
-    banner.anchor.setTo(0.5)
+    this.colors=[0xcc3333, 0x999933, 0x3333cc, 0x33cc33]
+    this.drawTree(GenomeData, game.width, game.height, 0, 0, 0);
 
-    this.mushroom = new Mushroom({
-      game: this.game,
-      x: this.world.centerX,
-      y: this.world.centerY,
-      asset: 'mushroom'
-    })
-
-    this.game.add.existing(this.mushroom)
   }
+  render () {}
 
-  render () {
-    if (__DEV__) {
-      this.game.debug.spriteInfo(this.mushroom, 32, 32)
+
+  drawTree(node, w, h, x, y, depth){
+
+    if(typeof(node.color) !== "undefined"){
+      let sq = game.add.sprite(x,y,"square");
+      sq.tint = this.colors[node.color]
+      sq.width = w;
+      sq.height = h;
+    }else{
+      this.drawTree(node["0"], w, h/2, x, y, depth+1);
+      this.drawTree(node["1"], w, h/2, x, y + (h/2), depth+1);
     }
   }
 }
