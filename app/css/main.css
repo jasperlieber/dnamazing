@@ -1,0 +1,22 @@
+#html-wrapper{
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+}
+
+#user-buttons{
+	width:128px;
+	overflow:scroll;
+	height:100%;
+	position:absolute;
+	right:0;
+
+}
+
+#user-buttons button{
+	background-size:contain;
+	width:128px;
+	height:128px;
+}
