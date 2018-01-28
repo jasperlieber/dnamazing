@@ -15,10 +15,13 @@ export default class extends Phaser.State {
     //
     // load your assets
     //
-    this.load.image('square', 'assets/images/common/square_64.jpg')
+    this.load.image('square', 'assets/images/common/square_64.jpg');
+
+
   }
 
   create () {
+    game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
     this.state.start('Game')
   }
 }
