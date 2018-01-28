@@ -16,6 +16,9 @@ export default class extends Phaser.State {
 
     this.colors=[0xff0000, 0x00ff00, 0x0000ff, 0xff00ff, 0xffff00, 0x00ffff]
 
+    this.maxDepth = 16;
+
+
     this.hudView = new HudView({
         "model": null,
         "state": this
@@ -47,7 +50,7 @@ export default class extends Phaser.State {
             that.myTreeGroup = game.add.group();
             that.myGenome = (parsed.genome);
 
-            that.drawTree(that.myGenome, game.width, game.height, 0, 0, 0, that.myTreeGroup);
+            that.drawTree(that.myGenome, game.width, game.height, 0, 0, 0, that.maxDepth, that.myTreeGroup);
         }
       })
 
@@ -57,21 +60,26 @@ export default class extends Phaser.State {
       // TODO: Tell Jasper to create me
       let myInitialColor = game.rnd.integerInRange(0, this.colors.length-1);
 
-      let myInititalGenomeString = "{\"color\":" + myInitialColor + "}";
+      let myInititalGenomeString = "{\"color\":" + myInitialColor + ", \"lr\":0}";
+
+
       $.ajax({
-        "url": "http://35.227.37.79/dna.php?newuser&genome=" + encodeURIComponent(myInititalGenomeString),
+        "url": "http://35.227.37.79/dna.php?newuser&numColors="+this.colors.length+"&genome=" + encodeURIComponent(myInititalGenomeString),
         // "url": "http://35.227.37.79/api.php",
         "method": "GET",
         "success": function( response ) {
+          console.log(response);
             let parsed = JSON.parse(response);
             that.myId = parsed.id;
-
             localStorage.setItem("my_id", that.myId)
-            that.myTreeGroup = game.add.group();
+            that.myGenome = {
+              "color": parsed.color,
+              "lr": 1
+            }
 
-            that.myGenome = JSON.parse(myInititalGenomeString);
-            
-            that.drawTree(that.myGenome, game.width, game.height, 0, 0, 0, that.myTreeGroup);
+            that.myTreeGroup = game.add.group();
+            that.drawTree(that.myGenome, game.width, game.height, 0, 0, 0, that.maxDepth, that.myTreeGroup);
+
         }
       })
 
@@ -103,25 +111,25 @@ export default class extends Phaser.State {
   render () {}
 
 
-  drawTree(node, w, h, x, y, depth, startGroup){
+  drawTree(node, w, h, x, y, depth, maxDepth, startGroup){
 
-    if(typeof(node.color) !== "undefined"){
+    if( depth<=maxDepth && typeof(node["0"]) !== "undefined" && typeof(node["1"]) !== "undefined" ){
+
+      if(depth%2===0){
+        this.drawTree(node["0"], w,   h/2, x,         y,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["1"], w,   h/2, x,         y + (h/2),  depth+1, maxDepth, startGroup);
+      }else{
+        this.drawTree(node["0"], w/2, h,   x,         y,        depth+1, maxDepth, startGroup);
+        this.drawTree(node["1"], w/2, h,   x + (w/2), y,        depth+1, maxDepth, startGroup);
+      }
+
+    }else if(typeof(node.color) !== "undefined"){
 
       let sq = game.add.sprite(x,y,"square");
       sq.tint = this.colors[node.color]
       sq.width = w;
       sq.height = h;
       startGroup.add(sq);
-
-    }else if( typeof(node["0"]) !== "undefined" && typeof(node["1"]) !== "undefined" ){
-
-      if(depth%2===0){
-        this.drawTree(node["0"], w, h/2, x, y, depth+1, startGroup);
-        this.drawTree(node["1"], w, h/2, x, y + (h/2), depth+1, startGroup);
-      }else{
-        this.drawTree(node["0"], w/2, h, x, y, depth+1, startGroup);
-        this.drawTree(node["1"], w/2, h, x + (w/2), y, depth+1, startGroup);
-      }
 
     }
 
@@ -131,7 +139,7 @@ export default class extends Phaser.State {
 
     for(let i = 0;i<userList.length;i++){
       let g = game.add.group();
-      this.drawTree(userList[i].genome, 512, 512, 0, 0, 0, g);
+      this.drawTree(userList[i].genome, 512, 512, 0, 0, 0, this.maxDepth, g);
       let tex = g.generateTexture();
       userList[i].dataUrl = tex.getCanvas().toDataURL();
       g.destroy();
@@ -153,19 +161,25 @@ export default class extends Phaser.State {
 
     if(otherUserData){
 
+      this.myGenome.lr = this.myGenome.lr == 1 ? 0 : 1
+
       let newTree = {
-        "0": this.myGenome,
-        "1": otherUserData.genome
+        "lr": this.myGenome.lr,
+        "color": this.myGenome.lr == 1 ? this.myGenome.color : otherUserData.genome.color,
+        "1": this.myGenome,
+        "0": otherUserData.genome
       };
 
       this.myGenome = newTree;
       this.myTreeGroup.removeAll();
 
-      this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.myTreeGroup);
+      this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, this.myTreeGroup);
 
       let myGenomeString = JSON.stringify(this.myGenome);
 
       let url = "http://35.227.37.79/dna.php"
+
+      console.log(myGenomeString);
 
       $.ajax({
         "url": url,
@@ -176,7 +190,7 @@ export default class extends Phaser.State {
           "genome": myGenomeString
         },
         "success": function( response ) {
-          console.log("FINISHED")
+          console.log("FINISHED", response)
         }
       })
 
@@ -187,6 +201,14 @@ export default class extends Phaser.State {
 
   }
 
+
+  resize(){
+    console.log("RESIZE");
+
+
+    this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, this.myTreeGroup);
+
+  }
 
 
 
