@@ -14,7 +14,24 @@ export default class extends Phaser.State {
 
     let that = this;
 
-    this.colors=[0xff0000, 0x00ff00, 0x0000ff, 0xff00ff, 0xffff00, 0x00ffff]
+    this.colors=[
+      0x709FA0,
+      0x452D38,
+      0x504458,
+      0x606470,
+      0x709FA0,
+      0xA3B9A3,
+      0xEAD3B4,
+      0xFAF4EC,
+      0xE0B638,
+      0xD87E38,
+      0xC0522E,
+      0xCE4257,
+      0x8F454D,
+      0xC7E25E,
+      0xA5BD66,
+      0x638A5C
+    ]
 
     this.maxDepth = null;
     this.calculateMaxDepth();
