@@ -317,9 +317,9 @@ export default class extends Phaser.State {
 
   calculateMaxDepth(){
     let biggest = Math.max(game.width,game.height);
-    this.maxDepth = (Math.log(biggest) / Math.log(2)) +2;
+    this.maxDepth = (Math.log(biggest) / Math.log(2)) + 2;
     
-    console.log("max screen size, maxDepth, maxTreeDepth = ", biggest, 
-        this.maxDepth, this.maxTreeDepth);
+//    console.log("max screen size, maxDepth, maxTreeDepth = ", biggest, 
+//        this.maxDepth, this.maxTreeDepth);
   }
 }
