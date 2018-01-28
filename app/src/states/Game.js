@@ -14,8 +14,8 @@ export default class extends Phaser.State {
 
     let that = this;
     
-    this.maxTreeDepth = 8;
-    this.maxThumbnailDepth = 4;
+    this.maxTreeDepth = 9;
+    this.maxThumbnailDepth = 6;
 
 
     this.algoNames = ["drawingAlgo1", "drawingAlgoSquareSpiral", "drawingAlgoSpiral", "drawingAlgoMatt"]
@@ -43,7 +43,7 @@ export default class extends Phaser.State {
     this.maxDepth = null;
     this.calculateMaxDepth();
 
-    this.pollFrequency = 2500;
+    this.pollFrequency = 500;
 
     this.hudView = new HudView({
         "model": null,
