@@ -18,24 +18,22 @@ export default class extends Phaser.State {
     this.maxThumbnailDepth = 6;
 
     this.colors=[
-      0x709FA0,
-      0x452D38,
-      0x504458,
-      0x606470,
-      0x709FA0,
-      0xA3B9A3,
-      0xEAD3B4,
-      0xFAF4EC,
+      // 0x709FA0,
+      0x302D55,
+      // 0x504458,
+      // 0x606470,
+      // 0xA3B9A3,
+      // 0xEAD3B4,
+      // 0xFAF4EC,
       0xE0B638,
       0xD87E38,
       0xC0522E,
-      0xCE4257,
+      // 0xCE4257,
       0x8F454D,
-      0xC7E25E,
-      0xA5BD66,
-      0x638A5C
+      // 0xC7E25E,
+      // 0xA5BD66,
+      0x89b233
     ]
-
 
     this.maxDepth = null;
     this.calculateMaxDepth();
@@ -109,6 +107,23 @@ export default class extends Phaser.State {
 
 
     this.updateThumbsForever();
+
+
+
+
+
+    // Show color options
+    // let foogroup = game.add.group();
+    // for(let i = 0;i<this.colors.length;i++){
+    //   let foo = game.add.sprite(i*50, 0, "square");
+    //   foo.width = 50;
+    //   foo.height = 50;
+    //   foo.tint = this.colors[i];
+    //   foogroup.add(foo);
+    // }
+
+
+
   }
   render () {}
 
@@ -143,19 +158,92 @@ export default class extends Phaser.State {
     
     }
 
-    game.time.events.add(this.pollFrequency, function(){
-      this.updateThumbsForever();
-    }, this)
+    // game.time.events.add(this.pollFrequency, function(){
+    //   this.updateThumbsForever();
+    // }, this)
 
   }
+
 
 
   drawTree(node, w, h, x, y, depth, maxDepth, startGroup){
 
-    this.drawingAlgo1(node, w, h, x, y, depth, maxDepth, startGroup);
+    // this.drawingAlgo1(node, w, h, x, y, depth, maxDepth, startGroup);
 //  this.drawingAlgoSpiral(node, w, h, x, y, depth, maxDepth, startGroup);
+
+    this.drawingAlgoMatt(node, w, h, x, y, depth, maxDepth, startGroup);
     
   }
+
+
+
+  drawingAlgoMatt(node, w, h, x, y, depth, maxDepth, startGroup){
+
+    if (node == null || typeof(node) === undefined) return;
+
+    let bgSquare = game.add.sprite(x,y, "square");
+    bgSquare.width = w;
+    bgSquare.height = h;
+    bgSquare.tint = node.cc;
+    startGroup.add(bgSquare);
+
+    let shrinkFactor = 1;
+
+    let next_w = (w/2) * shrinkFactor;
+
+
+    let next_h = h * shrinkFactor;
+
+
+
+
+    let x1 = ((1-shrinkFactor)/2) * (w/2);
+    let x2 = (w/2) + x1
+
+
+
+    console.log(x1, x2);
+
+
+
+
+    let y1 = ((1-shrinkFactor)/2) * next_h;
+    let y2 = y2;
+
+
+    // if (depth % 2 == 1) {
+    //   next_w = w * shrinkFactor;
+    //   next_h = (h/2) * shrinkFactor;
+
+    //   let x1 = ((1-shrinkFactor)/2) * w;
+    //   let x2 = x1;
+
+    //   let y1 = ((1-shrinkFactor)/2) * y;
+    //   let y2 = (h/2) + y2;
+
+    // }
+
+
+
+    
+    if( depth <= maxDepth && typeof(node["0"]) !== "undefined" && typeof(node["1"]) !== "undefined" ){
+
+        this.drawingAlgoMatt(node["0"], next_w, next_h, x1, y1, depth+1, maxDepth, startGroup);
+        this.drawingAlgoMatt(node["1"], next_w, next_h, x2, y2, depth+1, maxDepth, startGroup);
+
+    } else if (typeof(node.cc) !== "undefined") {
+      
+        let sq = game.add.sprite(x,y,"square");
+        sq.tint = this.colors[node.cc]
+        sq.width = w;
+        sq.height = h;
+        startGroup.add(sq);
+
+    }
+
+  }
+
+
   
   drawingAlgoSpiral(node, w, h, x, y, depth, maxDepth, startGroup){
     
@@ -287,6 +375,9 @@ export default class extends Phaser.State {
     
     this.myTreeGroup = game.add.group();
     this.myTreeGroup.add(newSprite);
+
+
+    game.world.sendToBack(this.myTreeGroup);
 
   }
 
