@@ -7,6 +7,7 @@ html, body{
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
+    background:#222244;
 }
 
 canvas{
@@ -33,18 +34,21 @@ canvas{
 	height:100%;
 	position:absolute;
 	right:0;
+  padding-top:10px;
+  padding-right:10px;
 	
 
 }
 
 #user-buttons button{
 	background-size:contain;
-	width:128px;
-	height:128px;
+	width:80px;
+	height:80px;
 	border:0;
 	padding:0;
 	margin:0;
 	display:block;
+  margin-bottom:10px;
 
 	box-shadow: -5px 0px 10px rgba(0,0,0,.25);
 	float:right;
@@ -52,8 +56,11 @@ canvas{
 
 	-webkit-transition: right 1s;
     transition: right 1s;
-    
+
 	position:relative;
+
+  border-radius:15px;
+  outline:0;
 }
 #user-buttons button:hover{
 
@@ -67,7 +74,9 @@ canvas{
 .sk-cube-grid {
   width: 40px;
   height: 40px;
-  margin: 100px auto;
+  margin: 40px auto;
+  float:right;
+  margin-right:40px;
 }
 
 .sk-cube-grid .sk-cube {

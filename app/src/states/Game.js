@@ -14,7 +14,7 @@ export default class extends Phaser.State {
 
     let that = this;
     
-    this.maxTreeDepth = 15;
+    this.maxTreeDepth = 12;
 
     this.colors=[
       0x709FA0,
@@ -62,7 +62,7 @@ export default class extends Phaser.State {
 
     if(this.myId){
       $.ajax({
-        "url": "http://35.227.37.79/dna.php?getuser&id="+this.myId,
+        "url": "http://35.227.37.79/dnaapi.php?getuser&id="+this.myId,
         "method": "GET",
         "success": function( response ) {
             let parsed = JSON.parse(response);
@@ -78,11 +78,11 @@ export default class extends Phaser.State {
       // TODO: Tell Jasper to create me
       let myInitialColor = game.rnd.integerInRange(0, this.colors.length-1);
 
-      let myInititalGenomeString = "{\"color\":" + myInitialColor + ", \"lr\":0}";
+      let myInititalGenomeString = "{\"cc\":" + myInitialColor + "}";
 
 
       $.ajax({
-        "url": "http://35.227.37.79/dna.php?newuser&numColors="
+        "url": "http://35.227.37.79/dnaapi.php?newuser&numColors="
             +this.colors.length+"&genome=" + encodeURIComponent(myInititalGenomeString),
         // "url": "http://35.227.37.79/api.php",
         "method": "GET",
@@ -91,8 +91,7 @@ export default class extends Phaser.State {
             that.myId = parsed.id;
             localStorage.setItem("my_id", that.myId)
             that.myGenome = {
-              "color": parsed.color,
-              "lr": 1
+              "cc": parsed.cc
             }
 
             that.drawMyTree();
@@ -120,8 +119,9 @@ export default class extends Phaser.State {
     if(this.isBusyThumbnailGetting !== true){
 
       this.isBusyThumbnailGetting = true;
+
       $.ajax({
-        "url": "http://35.227.37.79/dna.php?getallusers",
+        "url": "http://35.227.37.79/dnaapi.php?getallusers",
         "method": "GET",
         "success": function(response){
           
@@ -132,6 +132,8 @@ export default class extends Phaser.State {
           for(let i = 0;i<parsed.allUsers.length;i++){
             parsed.allUsers[i].genome = JSON.parse(parsed.allUsers[i].genome)
           }
+
+          that.allUsers = null;
 
           that.allUsers = parsed.allUsers;
           that.createUserButtons(parsed.allUsers);
@@ -173,10 +175,10 @@ export default class extends Phaser.State {
         this.drawTree(node["0"], w/3*2, h,   x + (w/3), y,          depth+1, maxDepth, startGroup);
       }
 
-    } else if (typeof(node.color) !== "undefined") {
+    } else if (typeof(node.cc) !== "undefined") {
       
       let sq = game.add.sprite(x,y,"square");
-      sq.tint = this.colors[node.color]
+      sq.tint = this.colors[node.cc]
       sq.width = w;
       sq.height = h;
       startGroup.add(sq);
@@ -199,10 +201,10 @@ export default class extends Phaser.State {
         this.drawTree(node["1"], w/3*2, h,   x + (w/3), y,          depth+1, maxDepth, startGroup);
       } 
 
-    } else if (typeof(node.color) !== "undefined") {
+    } else if (typeof(node.cc) !== "undefined") {
       
       let sq = game.add.sprite(x,y,"square");
-      sq.tint = this.colors[node.color]
+      sq.tint = this.colors[node.cc]
       sq.width = w;
       sq.height = h;
       startGroup.add(sq);
@@ -215,10 +217,12 @@ export default class extends Phaser.State {
   createUserButtons(userList){
 
     for(let i = 0;i<userList.length;i++){
+      
       let g = game.add.group();
-      this.drawTree(userList[i].genome, 128, 128, 0, 0, 0, 7, g);
+      this.drawTree(userList[i].genome, 80, 80, 0, 0, 0, 7, g);
       let tex = g.generateTexture();
       userList[i].dataUrl = tex.getCanvas().toDataURL();
+      
       g.destroy();
       tex.destroy();
     }
@@ -234,11 +238,9 @@ export default class extends Phaser.State {
 
     if(otherUserData){
 
-      this.myGenome.lr = this.myGenome.lr == 1 ? 0 : 1
 
       let newTree = {
-        "lr": this.myGenome.lr,
-        "color": this.myGenome.lr == 1 ? this.myGenome.color : otherUserData.genome.color,
+        "cc": this.myGenome.cc,
         "1": this.myGenome,
         "0": otherUserData.genome
       };
@@ -254,7 +256,7 @@ export default class extends Phaser.State {
 
       let myGenomeString = JSON.stringify(this.myGenome);
 
-      let url = "http://35.227.37.79/dna.php"
+      let url = "http://35.227.37.79/dnaapi.php"
 
       $.ajax({
         "url": url,
@@ -294,8 +296,7 @@ export default class extends Phaser.State {
   trimTree(someTree, depth) {
     
       let newTree = {
-          "lr": someTree.lr,
-          "color": someTree.color
+          "cc": someTree.cc
       };
 
       if (depth < this.maxTreeDepth && typeof(someTree["1"]) !== "undefined" 
@@ -310,7 +311,7 @@ export default class extends Phaser.State {
 
   doResize(){
 
-    game.scale.setGameSize(window.innerWidth-128, window.innerHeight);
+    game.scale.setGameSize(window.innerWidth-104, window.innerHeight);
     this.calculateMaxDepth();
     // $("#content").width(game.width-128);
     this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, 
