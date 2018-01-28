@@ -183,6 +183,14 @@ export default class extends Phaser.State {
         "0": otherUserData.genome
       };
 
+      let trimmedTree = this.trimTree(newTree, 0, 20);
+
+
+
+
+
+
+
       this.myGenome = newTree;
       this.myTreeGroup.removeAll();
 
@@ -214,6 +222,9 @@ export default class extends Phaser.State {
 
   }
 
+  trimTree(someTree, depth, maxDepth){
+
+  }
 
 
   doResize(){
