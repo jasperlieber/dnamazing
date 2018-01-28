@@ -43,7 +43,7 @@ export default class extends Phaser.State {
     this.maxDepth = null;
     this.calculateMaxDepth();
 
-    this.pollFrequency = 500;
+    this.pollFrequency = 1750;
 
     this.hudView = new HudView({
         "model": null,
