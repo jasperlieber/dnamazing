@@ -39,6 +39,7 @@ export default class extends View {
 
 	renderUserButtons(userList){
 		this.$userButtons.empty();
+		
 		for(let i = 0;i<userList.length;i++){
 			let user = userList[i];
 			let newButton = $("<button style=\"background-image: url(" + user.dataUrl + ");\" data-user-id=\"" + user.id + "\" ></button>");

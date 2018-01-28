@@ -15,7 +15,7 @@ export default class extends Phaser.State {
     //
     // load your assets
     //
-    this.load.image('square', 'assets/images/common/square_64.jpg');
+    this.load.image('square', 'assets/images/common/square_1.jpg');
 
 
   }

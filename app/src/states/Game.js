@@ -39,6 +39,8 @@ export default class extends Phaser.State {
     this.maxDepth = null;
     this.calculateMaxDepth();
 
+    this.pollFrequency = 500;
+
     this.hudView = new HudView({
         "model": null,
         "state": this
@@ -101,28 +103,50 @@ export default class extends Phaser.State {
 
     this.allUsers = [];
 
-    $.ajax({
-      "url": "http://35.227.37.79/dna.php?getallusers",
-      "method": "GET",
-      "success": function(response){
-        
-        let parsed = JSON.parse(response);
 
-        for(let i = 0;i<parsed.allUsers.length;i++){
-          parsed.allUsers[i].genome = JSON.parse(parsed.allUsers[i].genome)
-        }
-        that.allUsers = parsed.allUsers;
-        that.createUserButtons(parsed.allUsers);
-      }
-    })
 
     $(window).resize(function(){
       that.doResize();  
     })
 
-    // this.doResize();
+
+    this.updateThumbsForever();
   }
   render () {}
+
+
+  updateThumbsForever(){
+
+    let that = this;
+
+    if(this.isBusyThumbnailGetting !== true){
+
+      this.isBusyThumbnailGetting = true;
+      $.ajax({
+        "url": "http://35.227.37.79/dna.php?getallusers",
+        "method": "GET",
+        "success": function(response){
+          
+          that.isBusyThumbnailGetting = false;
+
+          let parsed = JSON.parse(response);
+
+          for(let i = 0;i<parsed.allUsers.length;i++){
+            parsed.allUsers[i].genome = JSON.parse(parsed.allUsers[i].genome)
+          }
+
+          that.allUsers = parsed.allUsers;
+          that.createUserButtons(parsed.allUsers);
+        }
+      })
+    
+    }
+
+    game.time.events.add(this.pollFrequency, function(){
+      this.updateThumbsForever();
+    }, this)
+
+  }
 
 
   drawTree(node, w, h, x, y, depth, maxDepth, startGroup){
@@ -132,7 +156,7 @@ export default class extends Phaser.State {
   }
 
   drawingAlgo(node, w, h, x, y, depth, maxDepth, startGroup){
-    if (typeof(node) === undefined) return;
+    if (node == null || typeof(node) === undefined) return;
     
     if( depth<=maxDepth && typeof(node["0"]) !== "undefined" && typeof(node["1"]) !== "undefined" ){
 
@@ -163,13 +187,14 @@ export default class extends Phaser.State {
 
     for(let i = 0;i<userList.length;i++){
       let g = game.add.group();
-      this.drawTree(userList[i].genome, 128, 128, 0, 0, 0, this.maxDepth, g);
+      this.drawTree(userList[i].genome, 128, 128, 0, 0, 0, 6, g);
       let tex = g.generateTexture();
       userList[i].dataUrl = tex.getCanvas().toDataURL();
       g.destroy();
     }
 
     this.hudView.renderUserButtons(userList);
+
   }
 
 
