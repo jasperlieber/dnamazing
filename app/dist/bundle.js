@@ -22558,9 +22558,14 @@ var Game = function (_Phaser$Game) {
     var width = window.innerWidth;
     var height = window.innerHeight;
 
+    var rightOffset = 104;
+    if (navigator.platform.indexOf('Win') > -1) {
+      rightOffset = 120;
+    }
+
     // super(width, height, Phaser.AUTO, 'content', '', true)
 
-    var _this = _possibleConstructorReturn(this, (Game.__proto__ || Object.getPrototypeOf(Game)).call(this, width - 120, height, _phaser2.default.CANVAS, 'content', '', true));
+    var _this = _possibleConstructorReturn(this, (Game.__proto__ || Object.getPrototypeOf(Game)).call(this, width - rightOffset, height, _phaser2.default.CANVAS, 'content', '', true));
 
     _this.state.add('Boot', _Boot2.default, false);
     _this.state.add('Splash', _Splash2.default, false);
@@ -22841,6 +22846,10 @@ var _class = function (_Phaser$State) {
       this.maxTreeDepth = 8;
       this.maxThumbnailDepth = 4;
 
+      this.algoNames = ["drawingAlgo1", "drawingAlgoSquareSpiral", "drawingAlgoSpiral", "drawingAlgoMatt"];
+      this.chosenAlgoIndex = 0;
+      this.chosenAlgoName = this.algoNames[this.chosenAlgoIndex];
+
       this.colors = [
       // 0x709FA0,
       0x302D55,
@@ -22888,6 +22897,8 @@ var _class = function (_Phaser$State) {
             that.myGenome = parsed.genome;
 
             that.drawMyTree();
+
+            that.updateThumbsForever();
           }
         });
       } else {
@@ -22898,7 +22909,7 @@ var _class = function (_Phaser$State) {
         var myInititalGenomeString = "{\"cc\":" + myInitialColor + "}";
 
         _jquery2.default.ajax({
-          "url": "http://35.227.37.79/dnaapi.php?newuser&numColors=" + this.colors.length + "&genome=" + encodeURIComponent(myInititalGenomeString),
+          "url": "http://35.227.37.79/dnaapi.php?newuser&numColors=" + this.colors.length,
           // "url": "http://35.227.37.79/api.php",
           "method": "GET",
           "success": function success(response) {
@@ -22906,10 +22917,11 @@ var _class = function (_Phaser$State) {
             that.myId = parsed.id;
             localStorage.setItem("my_id", that.myId);
             that.myGenome = {
-              "cc": parsed.cc
+              "cc": JSON.parse(parsed.cc)
             };
 
             that.drawMyTree();
+            that.updateThumbsForever();
           }
         });
       }
@@ -22919,8 +22931,6 @@ var _class = function (_Phaser$State) {
       (0, _jquery2.default)(window).resize(function () {
         that.doResize();
       });
-
-      this.updateThumbsForever();
 
       // Show color options
       // let foogroup = game.add.group();
@@ -22967,18 +22977,20 @@ var _class = function (_Phaser$State) {
         });
       }
 
-      // game.time.events.add(this.pollFrequency, function(){
-      //   this.updateThumbsForever();
-      // }, this)
+      game.time.events.add(this.pollFrequency, function () {
+        this.updateThumbsForever();
+      }, this);
     }
   }, {
     key: 'drawTree',
     value: function drawTree(node, w, h, x, y, depth, maxDepth, startGroup) {
 
+      this[this.chosenAlgoName](node, w, h, x, y, depth, maxDepth, startGroup);
+
       // this.drawingAlgo1(node, w, h, x, y, depth, maxDepth, startGroup);
       //  this.drawingAlgoSpiral(node, w, h, x, y, depth, maxDepth, startGroup);
 
-      this.drawingAlgoMatt(node, w, h, x, y, depth, maxDepth, startGroup);
+      // this.drawingAlgoMatt(node, w, h, x, y, depth, maxDepth, startGroup);
     }
   }, {
     key: 'drawingAlgoMatt',
@@ -22989,35 +23001,35 @@ var _class = function (_Phaser$State) {
       var bgSquare = game.add.sprite(x, y, "square");
       bgSquare.width = w;
       bgSquare.height = h;
-      bgSquare.tint = node.cc;
+      bgSquare.tint = this.colors[node.cc];
       startGroup.add(bgSquare);
 
-      var shrinkFactor = 1;
+      var shrinkFactor = .95;
 
       var next_w = w / 2 * shrinkFactor;
-
       var next_h = h * shrinkFactor;
 
-      var x1 = (1 - shrinkFactor) / 2 * (w / 2);
-      var x2 = w / 2 + x1;
+      var xOffset = (1 - shrinkFactor) / 2 * (w / 2);
+      var x1 = x + xOffset;
+      var x2 = x + w / 2 + xOffset;
 
-      console.log(x1, x2);
+      var yOffset = (1 - shrinkFactor) / 2 * h;
+      var y1 = y + yOffset;
+      var y2 = y + yOffset;
 
-      var y1 = (1 - shrinkFactor) / 2 * next_h;
-      var y2 = y2;
+      if (depth % 2 == 1) {
 
-      // if (depth % 2 == 1) {
-      //   next_w = w * shrinkFactor;
-      //   next_h = (h/2) * shrinkFactor;
+        next_w = w * shrinkFactor;
+        next_h = h / 2 * shrinkFactor;
 
-      //   let x1 = ((1-shrinkFactor)/2) * w;
-      //   let x2 = x1;
+        xOffset = (1 - shrinkFactor) / 2 * w;
+        x1 = x + xOffset;
+        x2 = x + xOffset;
 
-      //   let y1 = ((1-shrinkFactor)/2) * y;
-      //   let y2 = (h/2) + y2;
-
-      // }
-
+        yOffset = (1 - shrinkFactor) / 2 * (h / 2);
+        y1 = y + yOffset;
+        y2 = y + h / 2 + yOffset;
+      }
 
       if (depth <= maxDepth && typeof node["0"] !== "undefined" && typeof node["1"] !== "undefined") {
 
@@ -23027,6 +23039,36 @@ var _class = function (_Phaser$State) {
 
         var sq = game.add.sprite(x, y, "square");
         sq.tint = this.colors[node.cc];
+        sq.width = w;
+        sq.height = h;
+        startGroup.add(sq);
+      }
+    }
+  }, {
+    key: 'drawingAlgoSquareSpiral',
+    value: function drawingAlgoSquareSpiral(node, w, h, x, y, depth, maxDepth, startGroup) {
+
+      if (node == null || (typeof node === 'undefined' ? 'undefined' : _typeof(node)) === undefined) return;
+
+      if (depth <= maxDepth && typeof node["0"] !== "undefined" && typeof node["1"] !== "undefined") {
+
+        if (depth % 4 == 0) {
+          this.drawTree(node["0"], w, h / 3, x, y, depth + 1, maxDepth, startGroup);
+          this.drawTree(node["1"], w, h / 3 * 2, x, y + h / 3, depth + 1, maxDepth, startGroup);
+        } else if (depth % 4 == 1) {
+          this.drawTree(node["0"], w / 3, h, x, y, depth + 1, maxDepth, startGroup);
+          this.drawTree(node["1"], w / 3 * 2, h, x + w / 3, y, depth + 1, maxDepth, startGroup);
+        } else if (depth % 4 == 2) {
+          this.drawTree(node["1"], w, h / 3, x, y, depth + 1, maxDepth, startGroup);
+          this.drawTree(node["0"], w, h / 3 * 2, x, y + h / 3, depth + 1, maxDepth, startGroup);
+        } else {
+          this.drawTree(node["1"], w / 3, h, x, y, depth + 1, maxDepth, startGroup);
+          this.drawTree(node["0"], w / 3 * 2, h, x + w / 3, y, depth + 1, maxDepth, startGroup);
+        }
+      } else if (typeof node.cc !== "undefined") {
+        var fn = "square";
+        var sq = game.add.sprite(x, y, fn);
+        sq.tint = this.colors[/*typeof(node["1"]) !== "undefined" ? node["0"].cc :*/node.cc];
         sq.width = w;
         sq.height = h;
         startGroup.add(sq);
@@ -23182,7 +23224,12 @@ var _class = function (_Phaser$State) {
     key: 'doResize',
     value: function doResize() {
 
-      game.scale.setGameSize(window.innerWidth - 104, window.innerHeight);
+      var rightOffset = 104;
+      if (navigator.platform.indexOf('Win') > -1) {
+        rightOffset = 120;
+      }
+
+      game.scale.setGameSize(window.innerWidth - rightOffset, window.innerHeight);
       this.calculateMaxDepth();
       // $("#content").width(game.width-128);
       this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, this.myTreeGroup);
@@ -23195,6 +23242,16 @@ var _class = function (_Phaser$State) {
 
       //    console.log("max screen size, maxDepth, maxTreeDepth = ", biggest, 
       //        this.maxDepth, this.maxTreeDepth);
+    }
+  }, {
+    key: 'setAlgoName',
+    value: function setAlgoName() {
+
+      this.chosenAlgoIndex = (this.chosenAlgoIndex + 1) % this.algoNames.length;
+
+      this.chosenAlgoName = this.algoNames[this.chosenAlgoIndex];
+      this.drawMyTree();
+      this.createUserButtons(this.allUsers);
     }
   }]);
 
@@ -23254,10 +23311,11 @@ var _class = function (_View) {
 		var _this = _possibleConstructorReturn(this, (_class.__proto__ || Object.getPrototypeOf(_class)).call(this, {
 			el: el,
 			model: model,
-			className: "dna-wrapper"
-			// events: {
-			// 	// "click #user-buttons button": "doMate"
-			// }
+			className: "dna-wrapper",
+			events: {
+				"click #next-style": "nextStyle"
+				// 	// "click #user-buttons button": "doMate"
+			}
 		}));
 
 		_this.state = state;
@@ -23283,6 +23341,9 @@ var _class = function (_View) {
 
 			this.$userButtons = this.$el.find("#user-buttons");
 			// this.$promptText = this.$el.find(".prompt-text");
+
+
+			this.$el.find(".sk-cube-grid").addClass("active");
 		}
 	}, {
 		key: 'renderUserButtons',
@@ -23301,6 +23362,7 @@ var _class = function (_View) {
 
 					// let $currentTarget = $(e.currentTarget);
 					// let otherid = $currentTarget.data("user-id");
+					window.navigator.vibrate(75);
 					that.state.doMate(user.id);
 				});
 				_this2.$userButtons.append(newButton);
@@ -23310,16 +23372,25 @@ var _class = function (_View) {
 				_loop(i);
 			}
 		}
+
+		// doMate(e){
+
+		// 	e.preventDefault();
+
+
+		// 	let $currentTarget = $(e.currentTarget);
+		// 	let otherid = $currentTarget.data("user-id");
+		// 	this.state.doMate(otherid);
+
+		// 	return false;
+		// }
+
 	}, {
-		key: 'doMate',
-		value: function doMate(e) {
+		key: 'nextStyle',
+		value: function nextStyle(e) {
 
 			e.preventDefault();
-
-			var $currentTarget = (0, _jquery2.default)(e.currentTarget);
-			var otherid = $currentTarget.data("user-id");
-			this.state.doMate(otherid);
-
+			this.state.setAlgoName();
 			return false;
 		}
 	}]);
@@ -25271,7 +25342,7 @@ exports.default = _class;
 /*! all exports used */
 /***/ (function(module, exports) {
 
-module.exports = "<div id=\"user-buttons\">\n\t\n\t<div class=\"sk-cube-grid\">\n\t  <div class=\"sk-cube sk-cube1\"></div>\n\t  <div class=\"sk-cube sk-cube2\"></div>\n\t  <div class=\"sk-cube sk-cube3\"></div>\n\t  <div class=\"sk-cube sk-cube4\"></div>\n\t  <div class=\"sk-cube sk-cube5\"></div>\n\t  <div class=\"sk-cube sk-cube6\"></div>\n\t  <div class=\"sk-cube sk-cube7\"></div>\n\t  <div class=\"sk-cube sk-cube8\"></div>\n\t  <div class=\"sk-cube sk-cube9\"></div>\n\t</div>\n\n</div>";
+module.exports = "<div id=\"user-buttons\">\n\t\n\t<div class=\"sk-cube-grid\">\n\t  <div class=\"sk-cube sk-cube1\"></div>\n\t  <div class=\"sk-cube sk-cube2\"></div>\n\t  <div class=\"sk-cube sk-cube3\"></div>\n\t  <div class=\"sk-cube sk-cube4\"></div>\n\t  <div class=\"sk-cube sk-cube5\"></div>\n\t  <div class=\"sk-cube sk-cube6\"></div>\n\t  <div class=\"sk-cube sk-cube7\"></div>\n\t  <div class=\"sk-cube sk-cube8\"></div>\n\t  <div class=\"sk-cube sk-cube9\"></div>\n\t</div>\n\n</div>\n\n\n<button id=\"next-style\">Next Style</button>";
 
 /***/ }),
 /* 346 */

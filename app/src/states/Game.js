@@ -17,6 +17,11 @@ export default class extends Phaser.State {
     this.maxTreeDepth = 8;
     this.maxThumbnailDepth = 4;
 
+
+    this.algoNames = ["drawingAlgo1", "drawingAlgoSquareSpiral", "drawingAlgoSpiral", "drawingAlgoMatt"]
+    this.chosenAlgoIndex = 0;
+    this.chosenAlgoName = this.algoNames[this.chosenAlgoIndex];
+
     this.colors=[
       // 0x709FA0,
       0x302D55,
@@ -68,6 +73,10 @@ export default class extends Phaser.State {
             that.myGenome = (parsed.genome);
 
             that.drawMyTree();
+
+            that.updateThumbsForever();
+
+
         }
       })
 
@@ -82,7 +91,7 @@ export default class extends Phaser.State {
 
       $.ajax({
         "url": "http://35.227.37.79/dnaapi.php?newuser&numColors="
-            +this.colors.length+"&genome=" + encodeURIComponent(myInititalGenomeString),
+            +this.colors.length,
         // "url": "http://35.227.37.79/api.php",
         "method": "GET",
         "success": function( response ) {
@@ -90,10 +99,11 @@ export default class extends Phaser.State {
             that.myId = parsed.id;
             localStorage.setItem("my_id", that.myId)
             that.myGenome = {
-              "cc": parsed.cc
+              "cc": JSON.parse(parsed.cc)
             }
 
             that.drawMyTree();
+            that.updateThumbsForever();
 
         }
       })
@@ -106,7 +116,6 @@ export default class extends Phaser.State {
     })
 
 
-    this.updateThumbsForever();
 
 
 
@@ -158,9 +167,9 @@ export default class extends Phaser.State {
     
     }
 
-    // game.time.events.add(this.pollFrequency, function(){
-    //   this.updateThumbsForever();
-    // }, this)
+    game.time.events.add(this.pollFrequency, function(){
+      this.updateThumbsForever();
+    }, this)
 
   }
 
@@ -168,10 +177,13 @@ export default class extends Phaser.State {
 
   drawTree(node, w, h, x, y, depth, maxDepth, startGroup){
 
+
+    this[this.chosenAlgoName](node, w, h, x, y, depth, maxDepth, startGroup);
+
     // this.drawingAlgo1(node, w, h, x, y, depth, maxDepth, startGroup);
 //  this.drawingAlgoSpiral(node, w, h, x, y, depth, maxDepth, startGroup);
 
-    this.drawingAlgoMatt(node, w, h, x, y, depth, maxDepth, startGroup);
+    // this.drawingAlgoMatt(node, w, h, x, y, depth, maxDepth, startGroup);
     
   }
 
@@ -184,44 +196,37 @@ export default class extends Phaser.State {
     let bgSquare = game.add.sprite(x,y, "square");
     bgSquare.width = w;
     bgSquare.height = h;
-    bgSquare.tint = node.cc;
+    bgSquare.tint = this.colors[node.cc];
     startGroup.add(bgSquare);
 
-    let shrinkFactor = 1;
+    let shrinkFactor = .95;
 
     let next_w = (w/2) * shrinkFactor;
-
-
     let next_h = h * shrinkFactor;
 
+    let xOffset = ((1-shrinkFactor)/2) * (w/2);
+    let x1 = x + xOffset;
+    let x2 = x + (w/2) + xOffset
+
+    let yOffset = ((1-shrinkFactor)/2) * h;
+    let y1 = y + yOffset;
+    let y2 = y + yOffset;
 
 
+    if (depth % 2 == 1) {
 
-    let x1 = ((1-shrinkFactor)/2) * (w/2);
-    let x2 = (w/2) + x1
+      next_w = w * shrinkFactor;
+      next_h = (h/2) * shrinkFactor;
 
+      xOffset = ((1-shrinkFactor)/2) * (w);
+      x1 = x + xOffset;
+      x2 = x + xOffset
 
+      yOffset = ((1-shrinkFactor)/2) * (h/2);
+      y1 = y + yOffset;
+      y2 = y + (h/2) + yOffset;
 
-    console.log(x1, x2);
-
-
-
-
-    let y1 = ((1-shrinkFactor)/2) * next_h;
-    let y2 = y2;
-
-
-    // if (depth % 2 == 1) {
-    //   next_w = w * shrinkFactor;
-    //   next_h = (h/2) * shrinkFactor;
-
-    //   let x1 = ((1-shrinkFactor)/2) * w;
-    //   let x2 = x1;
-
-    //   let y1 = ((1-shrinkFactor)/2) * y;
-    //   let y2 = (h/2) + y2;
-
-    // }
+    }
 
 
 
@@ -244,7 +249,36 @@ export default class extends Phaser.State {
   }
 
 
-  
+  drawingAlgoSquareSpiral(node, w, h, x, y, depth, maxDepth, startGroup){
+    
+    if (node == null || typeof(node) === undefined) return;
+    
+    if( depth <= maxDepth && typeof(node["0"]) !== "undefined" && typeof(node["1"]) !== "undefined" ){
+
+      if (depth % 4 == 0) {
+        this.drawTree(node["0"], w,   h/3,   x,         y,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["1"], w,   h/3*2, x,         y + (h/3),  depth+1, maxDepth, startGroup);
+      } else if (depth % 4 == 1) {
+        this.drawTree(node["0"], w/3, h,   x,         y,            depth+1, maxDepth, startGroup);
+        this.drawTree(node["1"], w/3*2, h,   x + (w/3), y,          depth+1, maxDepth, startGroup);
+      } else if (depth % 4 == 2) {
+        this.drawTree(node["1"], w,   h/3, x,         y,            depth+1, maxDepth, startGroup);
+        this.drawTree(node["0"], w,   h/3*2, x,         y + (h/3),  depth+1, maxDepth, startGroup);
+      } else {
+        this.drawTree(node["1"], w/3, h,   x,         y,            depth+1, maxDepth, startGroup);
+        this.drawTree(node["0"], w/3*2, h,   x + (w/3), y,          depth+1, maxDepth, startGroup);
+      }
+
+    } else if (typeof(node.cc) !== "undefined") {
+      let fn = "square";
+      let sq = game.add.sprite(x,y,fn);
+      sq.tint = this.colors[/*typeof(node["1"]) !== "undefined" ? node["0"].cc :*/ node.cc];
+      sq.width = w;
+      sq.height = h;
+      startGroup.add(sq);
+
+    }
+  }
   drawingAlgoSpiral(node, w, h, x, y, depth, maxDepth, startGroup){
     
     if (node == null || typeof(node) === undefined) return;
@@ -402,7 +436,12 @@ export default class extends Phaser.State {
 
   doResize(){
 
-    game.scale.setGameSize(window.innerWidth-104, window.innerHeight);
+    let rightOffset = 104;
+    if(navigator.platform.indexOf('Win') > -1){
+      rightOffset = 120;
+    }
+
+    game.scale.setGameSize(window.innerWidth-rightOffset, window.innerHeight);
     this.calculateMaxDepth();
     // $("#content").width(game.width-128);
     this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, 
@@ -417,4 +456,16 @@ export default class extends Phaser.State {
 //    console.log("max screen size, maxDepth, maxTreeDepth = ", biggest, 
 //        this.maxDepth, this.maxTreeDepth);
   }
+
+
+  setAlgoName(){
+
+    this.chosenAlgoIndex = ( this.chosenAlgoIndex + 1 ) % this.algoNames.length;
+
+    this.chosenAlgoName = this.algoNames[this.chosenAlgoIndex];
+    this.drawMyTree();
+    this.createUserButtons(this.allUsers);
+
+  }
+
 }

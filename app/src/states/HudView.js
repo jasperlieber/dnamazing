@@ -10,10 +10,11 @@ export default class extends View {
 		super({
 			el: el, 
 			model: model,
-			className: "dna-wrapper"
-			// events: {
+			className: "dna-wrapper",
+			events: {
+				"click #next-style": "nextStyle"
 			// 	// "click #user-buttons button": "doMate"
-			// }
+			}
 		})
 
 		this.state = state;
@@ -34,6 +35,9 @@ export default class extends View {
 		this.$userButtons = this.$el.find("#user-buttons")
 		// this.$promptText = this.$el.find(".prompt-text");
     	
+
+		this.$el.find(".sk-cube-grid").addClass("active");
+
 	}
 
 
@@ -50,6 +54,7 @@ export default class extends View {
 
 				// let $currentTarget = $(e.currentTarget);
 				// let otherid = $currentTarget.data("user-id");
+				window.navigator.vibrate(75);
 				that.state.doMate(user.id);
 
 			});
@@ -58,15 +63,24 @@ export default class extends View {
 
 	}
 
-	doMate(e){
+	// doMate(e){
+
+	// 	e.preventDefault();
+		
+
+	// 	let $currentTarget = $(e.currentTarget);
+	// 	let otherid = $currentTarget.data("user-id");
+	// 	this.state.doMate(otherid);
+
+	// 	return false;
+	// }
+
+	nextStyle(e){
 
 		e.preventDefault();
-
-		let $currentTarget = $(e.currentTarget);
-		let otherid = $currentTarget.data("user-id");
-		this.state.doMate(otherid);
-
+		this.state.setAlgoName();
 		return false;
+
 	}
 }
 
