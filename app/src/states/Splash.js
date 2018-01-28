@@ -21,7 +21,6 @@ export default class extends Phaser.State {
   }
 
   create () {
-    game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
     this.state.start('Game')
   }
 }

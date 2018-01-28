@@ -16,7 +16,8 @@ export default class extends Phaser.State {
 
     this.colors=[0xff0000, 0x00ff00, 0x0000ff, 0xff00ff, 0xffff00, 0x00ffff]
 
-    this.maxDepth = 16;
+    this.maxDepth = null;
+    this.calculateMaxDepth();
 
 
     this.hudView = new HudView({
@@ -27,7 +28,7 @@ export default class extends Phaser.State {
     this.$htmlWrapper.append(this.hudView.$el);
 
     this.myId = null;
-    // localStorage.clear();
+    localStorage.clear();
 
     let myIdString = localStorage.getItem("my_id");
     if(myIdString){
@@ -39,14 +40,11 @@ export default class extends Phaser.State {
 
 
     if(this.myId){
-      console.log("MY ID FOUND");
-      console.log(this.myId);
       $.ajax({
         "url": "http://35.227.37.79/dna.php?getuser&id="+this.myId,
         "method": "GET",
         "success": function( response ) {
             let parsed = JSON.parse(response);
-            console.log(parsed);
             that.myTreeGroup = game.add.group();
             that.myGenome = (parsed.genome);
 
@@ -68,7 +66,6 @@ export default class extends Phaser.State {
         // "url": "http://35.227.37.79/api.php",
         "method": "GET",
         "success": function( response ) {
-          console.log(response);
             let parsed = JSON.parse(response);
             that.myId = parsed.id;
             localStorage.setItem("my_id", that.myId)
@@ -107,6 +104,14 @@ export default class extends Phaser.State {
     })
 
 
+
+
+    $(window).resize(function(){
+      that.doResize();  
+    })
+
+    // this.doResize();
+
   }
   render () {}
 
@@ -139,7 +144,7 @@ export default class extends Phaser.State {
 
     for(let i = 0;i<userList.length;i++){
       let g = game.add.group();
-      this.drawTree(userList[i].genome, 512, 512, 0, 0, 0, this.maxDepth, g);
+      this.drawTree(userList[i].genome, 128, 128, 0, 0, 0, this.maxDepth, g);
       let tex = g.generateTexture();
       userList[i].dataUrl = tex.getCanvas().toDataURL();
       g.destroy();
@@ -202,13 +207,25 @@ export default class extends Phaser.State {
   }
 
 
-  resize(){
-    console.log("RESIZE");
 
+  doResize(){
 
+    game.scale.setGameSize(window.innerWidth-128, window.innerHeight);
+    this.calculateMaxDepth();
+    // $("#content").width(game.width-128);
     this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, this.myTreeGroup);
 
+
   }
+
+
+  calculateMaxDepth(){
+    let smallest = Math.max(game.width,game.height);
+    this.maxDepth = (Math.log(smallest) / Math.log(2)) + 5;
+  }
+
+
+
 
 
 
