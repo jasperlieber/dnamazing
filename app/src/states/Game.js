@@ -14,7 +14,8 @@ export default class extends Phaser.State {
 
     let that = this;
     
-    this.maxTreeDepth = 7;
+    this.maxTreeDepth = 8;
+    this.maxThumbnailDepth = 6;
 
     this.colors=[
       0x709FA0,
@@ -151,11 +152,12 @@ export default class extends Phaser.State {
 
   drawTree(node, w, h, x, y, depth, maxDepth, startGroup){
 
-    this.drawingAlgo1(node, w, h, x, y, depth, maxDepth, startGroup)
-
+    this.drawingAlgo1(node, w, h, x, y, depth, maxDepth, startGroup);
+//  this.drawingAlgoSpiral(node, w, h, x, y, depth, maxDepth, startGroup);
+    
   }
-
-  drawingAlgo_spiral(node, w, h, x, y, depth, maxDepth, startGroup){
+  
+  drawingAlgoSpiral(node, w, h, x, y, depth, maxDepth, startGroup){
     
     if (node == null || typeof(node) === undefined) return;
     
@@ -219,7 +221,7 @@ export default class extends Phaser.State {
     for(let i = 0;i<userList.length;i++){
       
       let g = game.add.group();
-      this.drawTree(userList[i].genome, 80, 80, 0, 0, 0, 7, g);
+      this.drawTree(userList[i].genome, 80, 80, 0, 0, 0, this.maxThumbnailDepth, g);
       let tex = g.generateTexture();
       userList[i].dataUrl = tex.getCanvas().toDataURL();
       
@@ -249,8 +251,6 @@ export default class extends Phaser.State {
       this.myGenome = trimmedTree;
       this.myTreeGroup.removeAll();
 
-      // this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, this.myTreeGroup);
-
       this.drawMyTree();
 
       let myGenomeString = JSON.stringify(this.myGenome);
@@ -276,7 +276,8 @@ export default class extends Phaser.State {
   drawMyTree(){
 
     let tempGroup = game.add.group();
-    this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, tempGroup);
+    this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, 
+        tempGroup);
     let tex = tempGroup.generateTexture();
 
     tempGroup.destroy();
