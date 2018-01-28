@@ -15,7 +15,7 @@ export default class extends Phaser.State {
     let that = this;
     
     this.maxTreeDepth = 8;
-    this.maxThumbnailDepth = 6;
+    this.maxThumbnailDepth = 4;
 
     this.colors=[
       // 0x709FA0,
@@ -255,20 +255,20 @@ export default class extends Phaser.State {
         this.drawTree(node["0"], w,   h/3,   x,         y,          depth+1, maxDepth, startGroup);
         this.drawTree(node["1"], w,   h/3*2, x,         y + (h/3),  depth+1, maxDepth, startGroup);
       } else if (depth % 4 == 1) {
-        this.drawTree(node["0"], w/3, h,   x,         y,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["0"], w/3, h,   x,         y,            depth+1, maxDepth, startGroup);
         this.drawTree(node["1"], w/3*2, h,   x + (w/3), y,          depth+1, maxDepth, startGroup);
       } else if (depth % 4 == 2) {
-        this.drawTree(node["1"], w,   h/3, x,         y,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["1"], w,   h/3, x,         y,            depth+1, maxDepth, startGroup);
         this.drawTree(node["0"], w,   h/3*2, x,         y + (h/3),  depth+1, maxDepth, startGroup);
       } else {
-        this.drawTree(node["1"], w/3, h,   x,         y,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["1"], w/3, h,   x,         y,            depth+1, maxDepth, startGroup);
         this.drawTree(node["0"], w/3*2, h,   x + (w/3), y,          depth+1, maxDepth, startGroup);
       }
 
     } else if (typeof(node.cc) !== "undefined") {
-      
-      let sq = game.add.sprite(x,y,"circle");
-      sq.tint = this.colors[node.cc]
+      let fn = "arc" + (depth % 4 + 1);
+      let sq = game.add.sprite(x,y,fn);
+      sq.tint = this.colors[/*typeof(node["1"]) !== "undefined" ? node["0"].cc :*/ node.cc];
       sq.width = w;
       sq.height = h;
       startGroup.add(sq);
@@ -283,12 +283,15 @@ export default class extends Phaser.State {
     
     if( depth <= maxDepth && typeof(node["0"]) !== "undefined" && typeof(node["1"]) !== "undefined" ){
 
+      let b = 0;
+      
+      console.log(w-b*2,   h/2-b*2, x+b,         y-b);
       if (depth % 2 == 0) {
-        this.drawTree(node["0"], w,   h/2, x,         y,          depth+1, maxDepth, startGroup);
-        this.drawTree(node["1"], w,   h/2, x,         y + (h/2),  depth+1, maxDepth, startGroup);
+        this.drawTree(node["0"], w-b*2,   h/2-b*2, x+b,         y-b,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["1"], w-b*2,   h/2-b*2, x+b,         y+h/2-b,      depth+1, maxDepth, startGroup);
       } else {
-        this.drawTree(node["0"], w/2, h,   x,         y,          depth+1, maxDepth, startGroup);
-        this.drawTree(node["1"], w/2, h,   x + (w/2), y,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["0"], w/2-b*2, h-b*2,   x+b,         y-b,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["1"], w/2-b*2, h-b*2,   x+w/2+b,     y-b,          depth+1, maxDepth, startGroup);
       } 
 
     } else if (typeof(node.cc) !== "undefined") {

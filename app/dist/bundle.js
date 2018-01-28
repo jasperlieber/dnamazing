@@ -22730,6 +22730,10 @@ var _class = function (_Phaser$State) {
       //
       this.load.image('square', 'assets/images/common/square_1.jpg');
       this.load.image('circle', 'assets/images/common/circle_64.png');
+      this.load.image('arc1', 'assets/images/common/arc1.png');
+      this.load.image('arc2', 'assets/images/common/arc2.png');
+      this.load.image('arc3', 'assets/images/common/arc3.png');
+      this.load.image('arc4', 'assets/images/common/arc4.png');
     }
   }, {
     key: 'create',
@@ -22835,7 +22839,7 @@ var _class = function (_Phaser$State) {
       var that = this;
 
       this.maxTreeDepth = 8;
-      this.maxThumbnailDepth = 6;
+      this.maxThumbnailDepth = 4;
 
       this.colors = [
       // 0x709FA0,
@@ -23050,9 +23054,9 @@ var _class = function (_Phaser$State) {
           this.drawTree(node["0"], w / 3 * 2, h, x + w / 3, y, depth + 1, maxDepth, startGroup);
         }
       } else if (typeof node.cc !== "undefined") {
-
-        var sq = game.add.sprite(x, y, "circle");
-        sq.tint = this.colors[node.cc];
+        var fn = "arc" + (depth % 4 + 1);
+        var sq = game.add.sprite(x, y, fn);
+        sq.tint = this.colors[/*typeof(node["1"]) !== "undefined" ? node["0"].cc :*/node.cc];
         sq.width = w;
         sq.height = h;
         startGroup.add(sq);
@@ -23066,12 +23070,15 @@ var _class = function (_Phaser$State) {
 
       if (depth <= maxDepth && typeof node["0"] !== "undefined" && typeof node["1"] !== "undefined") {
 
+        var b = 0;
+
+        console.log(w - b * 2, h / 2 - b * 2, x + b, y - b);
         if (depth % 2 == 0) {
-          this.drawTree(node["0"], w, h / 2, x, y, depth + 1, maxDepth, startGroup);
-          this.drawTree(node["1"], w, h / 2, x, y + h / 2, depth + 1, maxDepth, startGroup);
+          this.drawTree(node["0"], w - b * 2, h / 2 - b * 2, x + b, y - b, depth + 1, maxDepth, startGroup);
+          this.drawTree(node["1"], w - b * 2, h / 2 - b * 2, x + b, y + h / 2 - b, depth + 1, maxDepth, startGroup);
         } else {
-          this.drawTree(node["0"], w / 2, h, x, y, depth + 1, maxDepth, startGroup);
-          this.drawTree(node["1"], w / 2, h, x + w / 2, y, depth + 1, maxDepth, startGroup);
+          this.drawTree(node["0"], w / 2 - b * 2, h - b * 2, x + b, y - b, depth + 1, maxDepth, startGroup);
+          this.drawTree(node["1"], w / 2 - b * 2, h - b * 2, x + w / 2 + b, y - b, depth + 1, maxDepth, startGroup);
         }
       } else if (typeof node.cc !== "undefined") {
 
