@@ -160,15 +160,21 @@ export default class extends Phaser.State {
     
     if( depth<=maxDepth && typeof(node["0"]) !== "undefined" && typeof(node["1"]) !== "undefined" ){
 
-      if(depth%2===0){
-        this.drawTree(node["0"], w,   h/2, x,         y,          depth+1, maxDepth, startGroup);
-        this.drawTree(node["1"], w,   h/2, x,         y + (h/2),  depth+1, maxDepth, startGroup);
-      }else{
-        this.drawTree(node["0"], w/2, h,   x,         y,        depth+1, maxDepth, startGroup);
-        this.drawTree(node["1"], w/2, h,   x + (w/2), y,        depth+1, maxDepth, startGroup);
+      if (depth % 4 == 0) {
+        this.drawingAlgo(node["0"], w,   h/3, x,         y,          depth+1, maxDepth, startGroup);
+        this.drawingAlgo(node["1"], w,   h/3, x,         y + (h/3),  depth+1, maxDepth, startGroup);
+      } else if (depth % 4 == 1) {
+        this.drawingAlgo(node["0"], w/3, h,   x,         y,          depth+1, maxDepth, startGroup);
+        this.drawingAlgo(node["1"], w/3, h,   x + (w/3), y,          depth+1, maxDepth, startGroup);
+      } else if (depth % 4 == 2) {
+        this.drawingAlgo(node["1"], w,   h/3, x,         y,          depth+1, maxDepth, startGroup);
+        this.drawingAlgo(node["0"], w,   h/3, x,         y + (h/3),  depth+1, maxDepth, startGroup);
+      } else {
+        this.drawingAlgo(node["1"], w/3, h,   x,         y,          depth+1, maxDepth, startGroup);
+        this.drawingAlgo(node["0"], w/3, h,   x + (w/3), y,          depth+1, maxDepth, startGroup);
       }
 
-    }else if(typeof(node.color) !== "undefined"){
+    }else if (typeof(node.color) !== "undefined") {
       
 //      console.log("da", w,h,depth);
 
