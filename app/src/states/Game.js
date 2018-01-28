@@ -118,6 +118,13 @@ export default class extends Phaser.State {
 
   drawTree(node, w, h, x, y, depth, maxDepth, startGroup){
 
+    this.drawingAlgo(node, w, h, x, y, depth, maxDepth, startGroup)
+
+  }
+
+
+
+  drawingAlgo(node, w, h, x, y, depth, maxDepth, startGroup){
     if( depth<=maxDepth && typeof(node["0"]) !== "undefined" && typeof(node["1"]) !== "undefined" ){
 
       if(depth%2===0){
@@ -137,8 +144,9 @@ export default class extends Phaser.State {
       startGroup.add(sq);
 
     }
-
   }
+
+
 
   createUserButtons(userList){
 
