@@ -5,5 +5,5 @@ plugins/
 
 .vscode/
 *.log
-/index.html
+
 build/
