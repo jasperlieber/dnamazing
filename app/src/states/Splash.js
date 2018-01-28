@@ -16,6 +16,7 @@ export default class extends Phaser.State {
     // load your assets
     //
     this.load.image('square', 'assets/images/common/square_1.jpg');
+    this.load.image('circle', 'assets/images/common/circle_64.png');
 
 
   }

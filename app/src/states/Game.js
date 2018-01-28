@@ -175,7 +175,7 @@ export default class extends Phaser.State {
 
     } else if (typeof(node.color) !== "undefined") {
       
-      let sq = game.add.sprite(x,y,"square");
+      let sq = game.add.sprite(x,y,"circle");
       sq.tint = this.colors[node.color]
       sq.width = w;
       sq.height = h;
