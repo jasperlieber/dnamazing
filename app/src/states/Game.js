@@ -139,6 +139,8 @@ export default class extends Phaser.State {
 
   updateThumbsForever(){
 
+
+
     let that = this;
 
     if(this.isBusyThumbnailGetting !== true){
@@ -150,6 +152,10 @@ export default class extends Phaser.State {
         "method": "GET",
         "success": function(response){
           
+
+          console.log("????")
+
+
           that.isBusyThumbnailGetting = false;
 
           let parsed = JSON.parse(response);

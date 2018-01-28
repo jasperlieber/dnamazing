@@ -22843,8 +22843,8 @@ var _class = function (_Phaser$State) {
 
       var that = this;
 
-      this.maxTreeDepth = 9;
-      this.maxThumbnailDepth = 6;
+      this.maxTreeDepth = 8;
+      this.maxThumbnailDepth = 4;
 
       this.algoNames = ["drawingAlgo1", "drawingAlgoSquareSpiral", "drawingAlgoSpiral", "drawingAlgoMatt"];
       this.chosenAlgoIndex = 0;
@@ -22868,7 +22868,7 @@ var _class = function (_Phaser$State) {
       this.maxDepth = null;
       this.calculateMaxDepth();
 
-      this.pollFrequency = 500;
+      this.pollFrequency = 1750;
 
       this.hudView = new _HudView2.default({
         "model": null,
@@ -22960,6 +22960,8 @@ var _class = function (_Phaser$State) {
           "url": "http://35.227.37.79/dnaapi.php?getallusers",
           "method": "GET",
           "success": function success(response) {
+
+            console.log("????");
 
             that.isBusyThumbnailGetting = false;
 
