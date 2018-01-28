@@ -66,10 +66,10 @@ export default class extends Phaser.State {
         "method": "GET",
         "success": function( response ) {
             let parsed = JSON.parse(response);
-            that.myTreeGroup = game.add.group();
             that.myGenome = (parsed.genome);
 
-            that.drawTree(that.myGenome, game.width, game.height, 0, 0, 0, that.maxDepth, that.myTreeGroup);
+            that.drawMyTree();
+            // that.drawTree(that.myGenome, game.width, game.height, 0, 0, 0, that.maxDepth, that.myTreeGroup);
         }
       })
 
@@ -95,8 +95,7 @@ export default class extends Phaser.State {
               "lr": 1
             }
 
-            that.myTreeGroup = game.add.group();
-            that.drawTree(that.myGenome, game.width, game.height, 0, 0, 0, that.maxDepth, that.myTreeGroup);
+            that.drawMyTree();
         }
       })
     }
@@ -224,7 +223,9 @@ export default class extends Phaser.State {
       this.myGenome = trimmedTree;
       this.myTreeGroup.removeAll();
 
-      this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, this.myTreeGroup);
+      // this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, this.myTreeGroup);
+
+      this.drawMyTree();
 
       let myGenomeString = JSON.stringify(this.myGenome);
 
@@ -244,6 +245,26 @@ export default class extends Phaser.State {
       })
     }
   }
+
+
+  drawMyTree(){
+
+    let tempGroup = game.add.group();
+    this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, tempGroup);
+    let tex = tempGroup.generateTexture();
+
+
+    tempGroup.destroy();
+    let newSprite = game.add.sprite(0,0,tex);
+
+    this.myTreeGroup.destroy();
+    
+    this.myTreeGroup = game.add.group();
+    this.myTreeGroup.add(newSprite);
+
+  }
+
+
 
   trimTree(someTree, depth) {
     

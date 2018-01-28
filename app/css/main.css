@@ -28,14 +28,13 @@ canvas{
 
 
 #user-buttons{
-	width:128px;
+	width:256px;
 	overflow:scroll;
 	height:100%;
 	position:absolute;
 	right:0;
 	
 
-	box-shadow: -5px 0px 10px rgba(0,0,0,.25);
 }
 
 #user-buttons button{
@@ -46,6 +45,19 @@ canvas{
 	padding:0;
 	margin:0;
 	display:block;
+
+	box-shadow: -5px 0px 10px rgba(0,0,0,.25);
+	float:right;
+	clear:both;
+
+	-webkit-transition: right 1s;
+    transition: right 1s;
+    
+	position:relative;
+}
+#user-buttons button:hover{
+
+	/*right:20px;*/
 
 }
 
