@@ -12,7 +12,7 @@ export default class extends View {
 			model: model,
 			className: "dna-wrapper"
 			// events: {
-			// 	"click #user-buttons button": "doMate"
+			// 	// "click #user-buttons button": "doMate"
 			// }
 		})
 

@@ -61,10 +61,21 @@ canvas{
 
   border-radius:15px;
   outline:0;
+
+  cursor:pointer;
+
+
 }
 #user-buttons button:hover{
 
+  transform: scale(1.13)
+
 	/*right:20px;*/
+
+}
+
+#user-buttons button:active{
+  transform: scale(.9)
 
 }
 

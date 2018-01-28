@@ -22833,14 +22833,14 @@ var _class = function (_Phaser$State) {
 
       var that = this;
 
-      this.maxTreeDepth = 12;
+      this.maxTreeDepth = 11;
 
       this.colors = [0x709FA0, 0x452D38, 0x504458, 0x606470, 0x709FA0, 0xA3B9A3, 0xEAD3B4, 0xFAF4EC, 0xE0B638, 0xD87E38, 0xC0522E, 0xCE4257, 0x8F454D, 0xC7E25E, 0xA5BD66, 0x638A5C];
 
       this.maxDepth = null;
       this.calculateMaxDepth();
 
-      this.pollFrequency = 500;
+      this.pollFrequency = 1500;
 
       this.hudView = new _HudView2.default({
         "model": null,
@@ -23167,7 +23167,7 @@ var _class = function (_View) {
 			model: model,
 			className: "dna-wrapper"
 			// events: {
-			// 	"click #user-buttons button": "doMate"
+			// 	// "click #user-buttons button": "doMate"
 			// }
 		}));
 

@@ -14,7 +14,7 @@ export default class extends Phaser.State {
 
     let that = this;
     
-    this.maxTreeDepth = 12;
+    this.maxTreeDepth = 11;
 
     this.colors=[
       0x709FA0,
@@ -39,7 +39,7 @@ export default class extends Phaser.State {
     this.maxDepth = null;
     this.calculateMaxDepth();
 
-    this.pollFrequency = 500;
+    this.pollFrequency = 1500;
 
     this.hudView = new HudView({
         "model": null,
