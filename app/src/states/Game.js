@@ -14,7 +14,7 @@ export default class extends Phaser.State {
 
     let that = this;
     
-    this.maxTreeDepth = 22;
+    this.maxTreeDepth = 15;
 
     this.colors=[
       0x709FA0,
@@ -83,7 +83,8 @@ export default class extends Phaser.State {
 
 
       $.ajax({
-        "url": "http://35.227.37.79/dna.php?newuser&numColors="+this.colors.length+"&genome=" + encodeURIComponent(myInititalGenomeString),
+        "url": "http://35.227.37.79/dna.php?newuser&numColors="
+            +this.colors.length+"&genome=" + encodeURIComponent(myInititalGenomeString),
         // "url": "http://35.227.37.79/api.php",
         "method": "GET",
         "success": function( response ) {
@@ -96,14 +97,13 @@ export default class extends Phaser.State {
             }
 
             that.myTreeGroup = game.add.group();
-            that.drawTree(that.myGenome, game.width, game.height, 0, 0, 0, that.maxDepth, that.myTreeGroup);
+            that.drawTree(that.myGenome, game.width, game.height, 0, 0, 0, 
+                that.maxDepth, that.myTreeGroup);
         }
       })
     }
 
     this.allUsers = [];
-
-
 
     $(window).resize(function(){
       that.doResize();  
@@ -151,33 +151,58 @@ export default class extends Phaser.State {
 
   drawTree(node, w, h, x, y, depth, maxDepth, startGroup){
 
-    this.drawingAlgo(node, w, h, x, y, depth, maxDepth, startGroup)
+    this.drawingAlgo2(node, w, h, x, y, depth, maxDepth, startGroup)
 
   }
 
   drawingAlgo(node, w, h, x, y, depth, maxDepth, startGroup){
+    
     if (node == null || typeof(node) === undefined) return;
     
-    if( depth<=maxDepth && typeof(node["0"]) !== "undefined" && typeof(node["1"]) !== "undefined" ){
+    if( depth <= maxDepth && typeof(node["0"]) !== "undefined" && typeof(node["1"]) !== "undefined" ){
 
       if (depth % 4 == 0) {
-        this.drawingAlgo(node["0"], w,   h/3, x,         y,          depth+1, maxDepth, startGroup);
-        this.drawingAlgo(node["1"], w,   h/3, x,         y + (h/3),  depth+1, maxDepth, startGroup);
+        this.drawTree(node["0"], w,   h/3,   x,         y,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["1"], w,   h/3*2, x,         y + (h/3),  depth+1, maxDepth, startGroup);
       } else if (depth % 4 == 1) {
-        this.drawingAlgo(node["0"], w/3, h,   x,         y,          depth+1, maxDepth, startGroup);
-        this.drawingAlgo(node["1"], w/3, h,   x + (w/3), y,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["0"], w/3, h,   x,         y,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["1"], w/3*2, h,   x + (w/3), y,          depth+1, maxDepth, startGroup);
       } else if (depth % 4 == 2) {
-        this.drawingAlgo(node["1"], w,   h/3, x,         y,          depth+1, maxDepth, startGroup);
-        this.drawingAlgo(node["0"], w,   h/3, x,         y + (h/3),  depth+1, maxDepth, startGroup);
+        this.drawTree(node["1"], w,   h/3, x,         y,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["0"], w,   h/3*2, x,         y + (h/3),  depth+1, maxDepth, startGroup);
       } else {
-        this.drawingAlgo(node["1"], w/3, h,   x,         y,          depth+1, maxDepth, startGroup);
-        this.drawingAlgo(node["0"], w/3, h,   x + (w/3), y,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["1"], w/3, h,   x,         y,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["0"], w/3*2, h,   x + (w/3), y,          depth+1, maxDepth, startGroup);
       }
 
-    }else if (typeof(node.color) !== "undefined") {
+    } else if (typeof(node.color) !== "undefined") {
       
-//      console.log("da", w,h,depth);
+      let sq = game.add.sprite(x,y,"square");
+      sq.tint = this.colors[node.color]
+      sq.width = w;
+      sq.height = h;
+      startGroup.add(sq);
 
+    }
+  }
+
+
+  drawingAlgo2(node, w, h, x, y, depth, maxDepth, startGroup){
+    
+    if (node == null || typeof(node) === undefined) return;
+    
+    if( depth <= maxDepth && typeof(node["0"]) !== "undefined" && typeof(node["1"]) !== "undefined" ){
+
+      if (depth % 2 == 0) {
+        this.drawTree(node["0"], w,   h/3,   x,         y,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["1"], w,   h/3*2, x,         y + (h/3),  depth+1, maxDepth, startGroup);
+      } else {
+        this.drawTree(node["0"], w/3, h,   x,         y,          depth+1, maxDepth, startGroup);
+        this.drawTree(node["1"], w/3*2, h,   x + (w/3), y,          depth+1, maxDepth, startGroup);
+      } 
+
+    } else if (typeof(node.color) !== "undefined") {
+      
       let sq = game.add.sprite(x,y,"square");
       sq.tint = this.colors[node.color]
       sq.width = w;
@@ -193,10 +218,11 @@ export default class extends Phaser.State {
 
     for(let i = 0;i<userList.length;i++){
       let g = game.add.group();
-      this.drawTree(userList[i].genome, 128, 128, 0, 0, 0, 6, g);
+      this.drawTree(userList[i].genome, 128, 128, 0, 0, 0, 7, g);
       let tex = g.generateTexture();
       userList[i].dataUrl = tex.getCanvas().toDataURL();
       g.destroy();
+      tex.destroy();
     }
 
     this.hudView.renderUserButtons(userList);
@@ -276,13 +302,7 @@ export default class extends Phaser.State {
     let biggest = Math.max(game.width,game.height);
     this.maxDepth = (Math.log(biggest) / Math.log(2)) + 6;
     
-    console.log(biggest, this.maxDepth);
+    console.log("max screen size, maxDepth, maxTreeDepth = ", biggest, 
+        this.maxDepth, this.maxTreeDepth);
   }
-
-
-
-
-
-
-
 }
