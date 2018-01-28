@@ -14,8 +14,8 @@ export default class extends Phaser.State {
 
     let that = this;
     
-    this.maxTreeDepth = 9;
-    this.maxThumbnailDepth = 6;
+    this.maxTreeDepth = 8;
+    this.maxThumbnailDepth = 4;
 
 
     this.algoNames = ["drawingAlgo1", "drawingAlgoSquareSpiral", "drawingAlgoSpiral", "drawingAlgoMatt"]
