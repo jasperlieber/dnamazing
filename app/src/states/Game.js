@@ -13,6 +13,8 @@ export default class extends Phaser.State {
   create () {
 
     let that = this;
+    
+    this.maxTreeDepth = 22;
 
     this.colors=[
       0x709FA0,
@@ -33,9 +35,9 @@ export default class extends Phaser.State {
       0x638A5C
     ]
 
+
     this.maxDepth = null;
     this.calculateMaxDepth();
-
 
     this.hudView = new HudView({
         "model": null,
@@ -93,16 +95,11 @@ export default class extends Phaser.State {
 
             that.myTreeGroup = game.add.group();
             that.drawTree(that.myGenome, game.width, game.height, 0, 0, 0, that.maxDepth, that.myTreeGroup);
-
         }
       })
-
     }
 
-
-
     this.allUsers = [];
-
 
     $.ajax({
       "url": "http://35.227.37.79/dna.php?getallusers",
@@ -116,19 +113,14 @@ export default class extends Phaser.State {
         }
         that.allUsers = parsed.allUsers;
         that.createUserButtons(parsed.allUsers);
-
       }
     })
-
-
-
 
     $(window).resize(function(){
       that.doResize();  
     })
 
     // this.doResize();
-
   }
   render () {}
 
@@ -139,9 +131,9 @@ export default class extends Phaser.State {
 
   }
 
-
-
   drawingAlgo(node, w, h, x, y, depth, maxDepth, startGroup){
+    if (typeof(node) === undefined) return;
+    
     if( depth<=maxDepth && typeof(node["0"]) !== "undefined" && typeof(node["1"]) !== "undefined" ){
 
       if(depth%2===0){
@@ -153,6 +145,8 @@ export default class extends Phaser.State {
       }
 
     }else if(typeof(node.color) !== "undefined"){
+      
+//      console.log("da", w,h,depth);
 
       let sq = game.add.sprite(x,y,"square");
       sq.tint = this.colors[node.color]
@@ -176,16 +170,10 @@ export default class extends Phaser.State {
     }
 
     this.hudView.renderUserButtons(userList);
-
-
   }
 
 
   doMate(otherUserId){
-
-
-
-
 
     let otherUserData =  _.findWhere(this.allUsers, {id: "" + otherUserId + ""});
 
@@ -200,15 +188,9 @@ export default class extends Phaser.State {
         "0": otherUserData.genome
       };
 
-      let trimmedTree = this.trimTree(newTree, 0, 20);
+      let trimmedTree = this.trimTree(newTree, 0);
 
-
-
-
-
-
-
-      this.myGenome = newTree;
+      this.myGenome = trimmedTree;
       this.myTreeGroup.removeAll();
 
       this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, this.myTreeGroup);
@@ -216,8 +198,6 @@ export default class extends Phaser.State {
       let myGenomeString = JSON.stringify(this.myGenome);
 
       let url = "http://35.227.37.79/dna.php"
-
-      console.log(myGenomeString);
 
       $.ajax({
         "url": url,
@@ -228,19 +208,26 @@ export default class extends Phaser.State {
           "genome": myGenomeString
         },
         "success": function( response ) {
-          console.log("FINISHED", response)
+//          console.log("FINISHED", response)
         }
       })
-
-
-
     }
-
-
   }
 
-  trimTree(someTree, depth, maxDepth){
+  trimTree(someTree, depth) {
+    
+      let newTree = {
+          "lr": someTree.lr,
+          "color": someTree.color
+      };
 
+      if (depth < this.maxTreeDepth && typeof(someTree["1"]) !== "undefined" 
+            && typeof(someTree["0"]) !== "undefined") {
+        newTree["1"] = this.trimTree(someTree["1"], depth+1);
+        newTree["0"] = this.trimTree(someTree["0"], depth+1);
+      }
+      
+      return newTree;
   }
 
 
@@ -249,15 +236,16 @@ export default class extends Phaser.State {
     game.scale.setGameSize(window.innerWidth-128, window.innerHeight);
     this.calculateMaxDepth();
     // $("#content").width(game.width-128);
-    this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, this.myTreeGroup);
-
-
+    this.drawTree(this.myGenome, game.width, game.height, 0, 0, 0, this.maxDepth, 
+        this.myTreeGroup);
   }
 
 
   calculateMaxDepth(){
-    let smallest = Math.max(game.width,game.height);
-    this.maxDepth = (Math.log(smallest) / Math.log(2)) + 5;
+    let biggest = Math.max(game.width,game.height);
+    this.maxDepth = (Math.log(biggest) / Math.log(2)) + 6;
+    
+    console.log(biggest, this.maxDepth);
   }
 
 
