@@ -319,7 +319,7 @@ export default class extends Phaser.State {
 
       let b = 0;
       
-      console.log(w-b*2,   h/2-b*2, x+b,         y-b);
+      // console.log(w-b*2,   h/2-b*2, x+b,         y-b);
       if (depth % 2 == 0) {
         this.drawTree(node["0"], w-b*2,   h/2-b*2, x+b,         y-b,          depth+1, maxDepth, startGroup);
         this.drawTree(node["1"], w-b*2,   h/2-b*2, x+b,         y+h/2-b,      depth+1, maxDepth, startGroup);

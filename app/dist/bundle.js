@@ -22843,8 +22843,8 @@ var _class = function (_Phaser$State) {
 
       var that = this;
 
-      this.maxTreeDepth = 8;
-      this.maxThumbnailDepth = 4;
+      this.maxTreeDepth = 9;
+      this.maxThumbnailDepth = 6;
 
       this.algoNames = ["drawingAlgo1", "drawingAlgoSquareSpiral", "drawingAlgoSpiral", "drawingAlgoMatt"];
       this.chosenAlgoIndex = 0;
@@ -22868,7 +22868,7 @@ var _class = function (_Phaser$State) {
       this.maxDepth = null;
       this.calculateMaxDepth();
 
-      this.pollFrequency = 2500;
+      this.pollFrequency = 500;
 
       this.hudView = new _HudView2.default({
         "model": null,
@@ -23114,7 +23114,7 @@ var _class = function (_Phaser$State) {
 
         var b = 0;
 
-        console.log(w - b * 2, h / 2 - b * 2, x + b, y - b);
+        // console.log(w-b*2,   h/2-b*2, x+b,         y-b);
         if (depth % 2 == 0) {
           this.drawTree(node["0"], w - b * 2, h / 2 - b * 2, x + b, y - b, depth + 1, maxDepth, startGroup);
           this.drawTree(node["1"], w - b * 2, h / 2 - b * 2, x + b, y + h / 2 - b, depth + 1, maxDepth, startGroup);
