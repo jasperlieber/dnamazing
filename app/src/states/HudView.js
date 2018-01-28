@@ -10,10 +10,10 @@ export default class extends View {
 		super({
 			el: el, 
 			model: model,
-			className: "river-tubing-wrapper",
-			events: {
-				"click #user-buttons button": "doMate"
-			}
+			className: "dna-wrapper"
+			// events: {
+			// 	// "click #user-buttons button": "doMate"
+			// }
 		})
 
 		this.state = state;
@@ -39,17 +39,27 @@ export default class extends View {
 
 	renderUserButtons(userList){
 		this.$userButtons.empty();
-		
+
+		let that = this;
+
 		for(let i = 0;i<userList.length;i++){
 			let user = userList[i];
 			let newButton = $("<button style=\"background-image: url(" + user.dataUrl + ");\" data-user-id=\"" + user.id + "\" ></button>");
+			newButton.on("click", function(){
+				// that.doMate();
+
+				// let $currentTarget = $(e.currentTarget);
+				// let otherid = $currentTarget.data("user-id");
+				that.state.doMate(user.id);
+
+			});
 			this.$userButtons.append(newButton);
 		}
 
-
-
 	}
+
 	doMate(e){
+
 		e.preventDefault();
 
 		let $currentTarget = $(e.currentTarget);
